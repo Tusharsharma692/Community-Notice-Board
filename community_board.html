@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Notice Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .notice-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .notice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-20">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6m-1 8h.01" />
+                    </svg>
+                    <h1 class="text-2xl font-bold ml-3">Local Community Hub</h1>
+                </div>
+                <div>
+                    <button id="admin-login-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300">Admin Login</button>
+                    <button id="post-notice-btn" class="hidden bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition duration-300">Post a Notice</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Navigation Tabs -->
+        <div class="mb-6">
+            <div class="border-b border-gray-200">
+                <nav id="category-nav" class="-mb-px flex space-x-8" aria-label="Tabs">
+                    <a href="#" data-category="all" class="category-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600">All Notices</a>
+                    <a href="#" data-category="announcement" class="category-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Announcements</a>
+                    <a href="#" data-category="event" class="category-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Events</a>
+                    <a href="#" data-category="marketplace" class="category-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Marketplace</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Notices Grid -->
+        <div id="notice-board" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Notices will be dynamically inserted here -->
+            <div id="loading-spinner" class="col-span-full flex justify-center items-center h-64">
+                <svg class="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+        </div>
+         <div id="no-notices-message" class="hidden col-span-full text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No notices found</h3>
+            <p class="mt-1 text-sm text-gray-500">Be the first to post something!</p>
+        </div>
+
+        <!-- Important Contacts Section -->
+        <div class="my-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b pb-2">Important Contacts</h2>
+            <div id="contacts-section" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Contact cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Posting Notice -->
+    <div id="notice-modal" class="hidden fixed z-30 inset-0 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <form id="notice-form">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Post a New Notice</h3>
+                        <div class="mt-4 space-y-4">
+                            <div>
+                                <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                                <input type="text" name="title" id="title" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                            </div>
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea id="description" name="description" rows="4" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required></textarea>
+                            </div>
+                            <div>
+                                <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                                <select id="category" name="category" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" required>
+                                    <option value="announcement">Announcement</option>
+                                    <option value="event">Event</option>
+                                    <option value="marketplace">Marketplace</option>
+                                    <option value="contact">Important Contact</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="contact" class="block text-sm font-medium text-gray-700">Contact Info (Phone, Email, etc.)</label>
+                                <input type="text" name="contact" id="contact" placeholder="e.g., 112" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">Post</button>
+                        <button type="button" id="cancel-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert/Message Box -->
+    <div id="message-box" class="hidden fixed top-5 right-5 bg-red-500 text-white py-2 px-4 rounded-lg shadow-lg animate-pulse z-40">
+        <p id="message-text"></p>
+    </div>
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        const app = initializeApp(JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify(firebaseConfig)));
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-community-board';
+        
+        // --- State ---
+        let isAdmin = false;
+        let currentFilter = 'all';
+        let allNotices = [];
+        let unsubscribe; 
+
+        // --- DOM Elements ---
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        const postNoticeBtn = document.getElementById('post-notice-btn');
+        const noticeModal = document.getElementById('notice-modal');
+        const noticeForm = document.getElementById('notice-form');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const noticeBoard = document.getElementById('notice-board');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const noNoticesMessage = document.getElementById('no-notices-message');
+        const categoryNav = document.getElementById('category-nav');
+        const contactsSection = document.getElementById('contacts-section');
+
+        // --- Admin Login ---
+        adminLoginBtn.addEventListener('click', () => {
+            const password = prompt("Enter admin password:");
+            if (password === "123456789") {
+                isAdmin = true;
+                adminLoginBtn.classList.add('hidden');
+                postNoticeBtn.classList.remove('hidden');
+                showMessage("Admin access granted.", "success");
+            } else if (password !== null) {
+                showMessage("Incorrect password.");
+            }
+        });
+
+        // --- Modal Handling ---
+        postNoticeBtn.addEventListener('click', () => {
+            noticeModal.classList.remove('hidden');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            noticeModal.classList.add('hidden');
+            noticeForm.reset();
+        });
+
+        // --- Form Submission ---
+        noticeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!isAdmin) {
+                showMessage("Admin access required to post notices.");
+                return;
+            }
+
+            const formData = new FormData(noticeForm);
+            const newNotice = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                category: formData.get('category'),
+                contact: formData.get('contact'),
+                createdAt: new Date()
+            };
+
+            try {
+                const noticesCollectionRef = collection(db, `artifacts/${appId}/public/data/notices`);
+                await addDoc(noticesCollectionRef, newNotice);
+                noticeModal.classList.add('hidden');
+                noticeForm.reset();
+                showMessage("Notice posted successfully!", "success");
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                showMessage("Failed to post notice. Please try again.");
+            }
+        });
+
+        // --- Display Logic ---
+        function renderNotices() {
+            noticeBoard.innerHTML = ''; // Clear existing notices
+            const filteredNotices = allNotices.filter(notice => 
+                currentFilter === 'all' || notice.category === currentFilter
+            );
+
+            if (filteredNotices.length === 0 && loadingSpinner.style.display === 'none') {
+                 noNoticesMessage.classList.remove('hidden');
+            } else {
+                 noNoticesMessage.classList.add('hidden');
+            }
+
+            filteredNotices.forEach(notice => {
+                const card = createNoticeCard(notice);
+                noticeBoard.appendChild(card);
+            });
+        }
+        
+        function getCategoryStyles(category) {
+            switch(category) {
+                case 'announcement': return { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-500' };
+                case 'event': return { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-500' };
+                case 'marketplace': return { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-500' };
+                default: return { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-400' };
+            }
+        }
+
+        function createNoticeCard(notice) {
+            const card = document.createElement('div');
+            const styles = getCategoryStyles(notice.category);
+            
+            card.className = `notice-card bg-white rounded-lg shadow-lg overflow-hidden border-l-4 ${styles.border}`;
+            
+            const formattedDate = notice.createdAt.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            card.innerHTML = `
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-block ${styles.bg} ${styles.text} px-3 py-1 text-xs font-semibold rounded-full uppercase">${notice.category}</span>
+                        <p class="text-xs text-gray-500">${formattedDate}</p>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">${notice.title}</h3>
+                    <p class="text-gray-700 mb-4 whitespace-pre-wrap">${notice.description}</p>
+                    ${notice.contact ? `<div class="border-t pt-3 mt-3">
+                        <p class="text-sm text-gray-600"><strong class="font-semibold">Contact:</strong> ${notice.contact}</p>
+                    </div>` : ''}
+                </div>
+            `;
+            return card;
+        }
+
+        function renderContacts(contacts) {
+            contactsSection.innerHTML = ''; // Clear existing contacts
+
+            if (contacts.length === 0) {
+                contactsSection.innerHTML = `<p class="text-gray-500 col-span-full">No important contacts have been added yet.</p>`;
+                return;
+            }
+
+            contacts.forEach(contact => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow p-5 flex flex-col justify-center items-center text-center';
+                card.innerHTML = `
+                    <h4 class="text-lg font-bold text-indigo-700">${contact.title}</h4>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2">${contact.contact || ''}</p>
+                    <p class="text-sm text-gray-600 mt-1">${contact.description || ''}</p>
+                `;
+                contactsSection.appendChild(card);
+            });
+        }
+
+        // --- Filtering ---
+        categoryNav.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (e.target.classList.contains('category-tab')) {
+                currentFilter = e.target.dataset.category;
+                
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    tab.classList.remove('border-indigo-500', 'text-indigo-600');
+                    tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                });
+                e.target.classList.add('border-indigo-500', 'text-indigo-600');
+                e.target.classList.remove('border-transparent', 'text-gray-500');
+
+                renderNotices();
+            }
+        });
+
+        // --- Data Seeding ---
+        async function seedInitialData() {
+            const noticesCollectionRef = collection(db, `artifacts/${appId}/public/data/notices`);
+            const initialData = [
+                { title: "Water Supply Interruption", description: "Please note that the water supply will be interrupted on August 5th from 10:00 AM to 2:00 PM for scheduled maintenance.", category: "announcement", createdAt: new Date("2025-08-02T10:00:00") },
+                { title: "Community Clean-Up Drive", description: "Join us for a community clean-up drive on Sunday, August 10th at 9:00 AM. Meet at the community park. Gloves and bags will be provided.", category: "event", contact: "Mr. Sharma, Block A", createdAt: new Date("2025-08-01T15:30:00") },
+                { title: "National Emergency", description: "All-in-one helpline", category: "contact", contact: "112", createdAt: new Date() },
+                { title: "Police", description: "Local Police Control Room", category: "contact", contact: "100", createdAt: new Date() },
+                { title: "Fire & Rescue", description: "Fire Brigade", category: "contact", contact: "101", createdAt: new Date() },
+                { title: "Ambulance", description: "Medical Emergency", category: "contact", contact: "102 / 108", createdAt: new Date() },
+                { title: "Women Helpline", description: "For women in distress", category: "contact", contact: "1091", createdAt: new Date() },
+                { title: "Child Helpline", description: "For children in need of care", category: "contact", contact: "1098", createdAt: new Date() },
+                { title: "Society Security", description: "Main Gate", category: "contact", contact: "0120-XXXX-XXX", createdAt: new Date() },
+                { title: "Electricity Board", description: "For power-related issues", category: "contact", contact: "1912 (UPPCL)", createdAt: new Date() }
+            ];
+
+            for (const item of initialData) {
+                try {
+                    await addDoc(noticesCollectionRef, item);
+                } catch (error) {
+                    console.error("Error seeding data: ", error);
+                }
+            }
+        }
+
+        // --- Data Fetching ---
+        function setupSnapshotListener() {
+            if (unsubscribe) return;
+
+            const noticesCollectionRef = collection(db, `artifacts/${appId}/public/data/notices`);
+            const q = query(noticesCollectionRef);
+            
+            unsubscribe = onSnapshot(q, (querySnapshot) => {
+                loadingSpinner.style.display = 'none';
+                
+                if (querySnapshot.empty) {
+                    seedInitialData();
+                } else {
+                    const notices = [];
+                    const contacts = [];
+                    querySnapshot.forEach((doc) => {
+                        const data = { id: doc.id, ...doc.data() };
+                        if (data.createdAt && data.createdAt.toDate) {
+                            data.createdAt = data.createdAt.toDate();
+                        } else {
+                            data.createdAt = new Date(0); 
+                        }
+
+                        if (data.category === 'contact') {
+                            contacts.push(data);
+                        } else {
+                            notices.push(data);
+                        }
+                    });
+
+                    allNotices = notices.sort((a, b) => b.createdAt - a.createdAt);
+                    renderNotices();
+
+                    contacts.sort((a, b) => (a.title > b.title) ? 1 : -1);
+                    renderContacts(contacts);
+                }
+            }, (error) => {
+                console.error("Error fetching notices: ", error);
+                loadingSpinner.style.display = 'none';
+                showMessage("Error fetching notices. Please check your Firestore security rules.");
+            });
+        }
+
+        // --- Authentication ---
+        async function initializeAndAuthenticate() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log("User authenticated with UID:", user.uid);
+                    setupSnapshotListener();
+                } else {
+                    if (unsubscribe) {
+                        unsubscribe();
+                        unsubscribe = null;
+                    }
+                    console.log("No user authenticated.");
+                }
+            });
+
+            try {
+                if (!auth.currentUser) {
+                     console.log("Attempting to sign in...");
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                }
+            } catch (error) {
+                console.error("Authentication failed:", error);
+                loadingSpinner.style.display = 'none';
+                showMessage("Could not connect to the server. Please refresh.");
+            }
+        }
+
+        // --- Utility ---
+        function showMessage(message, type = "error") {
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+            
+            messageText.textContent = message;
+            messageBox.classList.remove('bg-red-500', 'bg-green-500');
+            
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-500');
+            } else {
+                messageBox.classList.add('bg-red-500');
+            }
+
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        }
+
+        // --- Start the app ---
+        initializeAndAuthenticate();
+
+    </script>
+</body>
+</html>
